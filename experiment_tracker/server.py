@@ -19,6 +19,22 @@ from mcp.server.fastmcp import FastMCP
 
 from experiment_tracker import __version__
 from experiment_tracker.db import default_db_path, get_engine, init_db
+from experiment_tracker.tools.artifacts import LOG_ARTIFACT_DESCRIPTION, log_artifact
+from experiment_tracker.tools.compare import (
+    BEST_RUN_DESCRIPTION,
+    COMPARE_RUNS_DESCRIPTION,
+    best_run,
+    compare_runs,
+)
+from experiment_tracker.tools.metrics import LOG_METRIC_DESCRIPTION, log_metric
+from experiment_tracker.tools.runs import (
+    COMPLETE_RUN_DESCRIPTION,
+    LIST_RUNS_DESCRIPTION,
+    START_RUN_DESCRIPTION,
+    complete_run,
+    list_runs,
+    start_run,
+)
 
 logger = logging.getLogger("experiment_tracker")
 
@@ -47,6 +63,13 @@ def build_server(db_path: Path | None = None) -> FastMCP:
             "compare_runs / best_run to choose between alternatives."
         ),
     )
+    server.add_tool(start_run, description=START_RUN_DESCRIPTION)
+    server.add_tool(list_runs, description=LIST_RUNS_DESCRIPTION)
+    server.add_tool(complete_run, description=COMPLETE_RUN_DESCRIPTION)
+    server.add_tool(log_metric, description=LOG_METRIC_DESCRIPTION)
+    server.add_tool(log_artifact, description=LOG_ARTIFACT_DESCRIPTION)
+    server.add_tool(compare_runs, description=COMPARE_RUNS_DESCRIPTION)
+    server.add_tool(best_run, description=BEST_RUN_DESCRIPTION)
     return server
 
 
