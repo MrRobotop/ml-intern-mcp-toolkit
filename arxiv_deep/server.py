@@ -19,6 +19,7 @@ import sys
 from mcp.server.fastmcp import FastMCP
 
 from arxiv_deep import __version__
+from arxiv_deep.tools.fetch import FETCH_PAPER_DESCRIPTION, fetch_paper
 
 logger = logging.getLogger("arxiv_deep")
 
@@ -40,6 +41,7 @@ def build_server() -> FastMCP:
             "than just the abstract."
         ),
     )
+    server.add_tool(fetch_paper, description=FETCH_PAPER_DESCRIPTION)
     return server
 
 

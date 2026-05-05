@@ -59,6 +59,13 @@ python_version = "3.11"
 files = ["arxiv_deep", "experiment_tracker"]
 exclude = ["^tests/"]
 
+# Third-party packages that lack a py.typed marker or ship incomplete stubs.
+# We only silence the missing-stub error; our own code remains under strict.
+[[tool.mypy.overrides]]
+module = ["arxiv", "pymupdf"]
+ignore_missing_imports = true
+follow_imports = "skip"
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
