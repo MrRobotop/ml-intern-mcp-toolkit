@@ -26,6 +26,7 @@ demo = [
 
 [project.scripts]
 arxiv-deep-server = "arxiv_deep.server:main"
+experiment-tracker-server = "experiment_tracker.server:main"
 
 [dependency-groups]
 dev = [
