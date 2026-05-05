@@ -1,0 +1,16 @@
+[project]
+name = "ml-intern-mcp-toolkit"
+version = "0.0.0"
+description = "MCP toolkit extending Hugging Face's ml-intern with deep arxiv reading and experiment tracking."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[project.scripts]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["arxiv_deep", "experiment_tracker"]

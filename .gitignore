@@ -1,0 +1,34 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Env
+.env
+.env.*
+
+# Test / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Tooling caches
+.ruff_cache/
+.mypy_cache/
+
+# Project caches
+tests/fixtures/cache/
+~/.cache/arxiv-deep/
+
+# Binary fixtures
+*.pdf
+*.png
+!docs/images/*.png
+
+# Build
+dist/
+build/
+
+# Claude Code per-user settings (project-shared settings live in .claude/settings.json)
+.claude/settings.local.json
