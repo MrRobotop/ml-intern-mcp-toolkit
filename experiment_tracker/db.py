@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 from collections.abc import Iterator
 from contextlib import contextmanager
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -67,6 +68,30 @@ def init_db(engine: Engine) -> None:
     SQLModel.metadata.create_all(engine)
 
 
+@lru_cache(maxsize=8)
+def _engine_for_path(path: str) -> Engine:
+    """Return a cached engine for ``path``, creating it on first call.
+
+    The cache is keyed on the resolved string path so different DB paths get
+    independent engines. Tests get fresh engines per test because each test
+    points ``EXPERIMENT_TRACKER_DB_PATH`` at a unique ``tmp_path``.
+    """
+    engine = get_engine(Path(path))
+    init_db(engine)
+    return engine
+
+
+def current_engine() -> Engine:
+    """Return the engine bound to the currently-configured database path.
+
+    Resolves the path via :func:`default_db_path` on each call so changes to
+    the ``EXPERIMENT_TRACKER_DB_PATH`` environment variable take effect
+    without restarting the process. The engine itself is cached per resolved
+    path, so repeat calls to this function are cheap.
+    """
+    return _engine_for_path(str(default_db_path()))
+
+
 @contextmanager
 def get_session(engine: Engine) -> Iterator[Session]:
     """Yield a :class:`Session` bound to ``engine`` and close it on exit.
@@ -98,4 +123,10 @@ def _enable_sqlite_foreign_keys(engine: Engine) -> None:
         cursor.close()
 
 
-__all__ = ["default_db_path", "get_engine", "get_session", "init_db"]
+__all__ = [
+    "current_engine",
+    "default_db_path",
+    "get_engine",
+    "get_session",
+    "init_db",
+]
