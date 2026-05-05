@@ -1,0 +1,29 @@
+{
+  "_comment": "ml-intern user-config snippet for the ml-intern-mcp-toolkit. Point ml-intern at this file via $ML_INTERN_CLI_CONFIG (or copy to ~/.config/ml-intern/cli_agent_config.json). Required env: ML_INTERN_TOOLKIT_PATH (absolute path to the toolkit checkout). Optional env: EXPERIMENT_TRACKER_DB_PATH, ARXIV_DEEP_CACHE_DIR. See docs/ml_intern_integration.md for setup.",
+  "mcpServers": {
+    "arxiv-deep": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--project",
+        "${ML_INTERN_TOOLKIT_PATH}",
+        "arxiv-deep-server"
+      ],
+      "env": {
+        "ARXIV_DEEP_CACHE_DIR": "${ARXIV_DEEP_CACHE_DIR:-}"
+      }
+    },
+    "experiment-tracker": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--project",
+        "${ML_INTERN_TOOLKIT_PATH}",
+        "experiment-tracker-server"
+      ],
+      "env": {
+        "EXPERIMENT_TRACKER_DB_PATH": "${EXPERIMENT_TRACKER_DB_PATH:-}"
+      }
+    }
+  }
+}
