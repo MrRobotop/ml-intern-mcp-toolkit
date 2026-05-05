@@ -13,7 +13,9 @@ import re
 from pathlib import Path
 
 import pytest
-from experiment_tracker.tools.runs import list_runs, start_run
+
+from experiment_tracker.exceptions import RunNotFoundError
+from experiment_tracker.tools.runs import complete_run, list_runs, start_run
 
 _UUID4_HEX_RE = re.compile(r"^[a-f0-9]{32}$")
 
@@ -110,3 +112,36 @@ def test_list_runs_combined_filters_and_together(tracker_db: Path) -> None:
     assert len(matched) == 1
     assert matched[0]["recipe"] == "lora-r4"
     assert matched[0]["model_base"] == "A"
+
+
+def test_complete_run_default_status_is_completed(tracker_db: Path) -> None:
+    started = start_run(**_DEFAULT_KW)  # type: ignore[arg-type]
+
+    out = complete_run(started["run_uid"])
+    assert out["run_uid"] == started["run_uid"]
+    assert out["status"] == "completed"
+
+    persisted = next(row for row in list_runs() if row["run_uid"] == started["run_uid"])
+    assert persisted["status"] == "completed"
+
+
+def test_complete_run_failed_status_persists(tracker_db: Path) -> None:
+    started = start_run(**_DEFAULT_KW)  # type: ignore[arg-type]
+
+    out = complete_run(started["run_uid"], status="failed")
+    assert out["status"] == "failed"
+
+    persisted = next(row for row in list_runs() if row["run_uid"] == started["run_uid"])
+    assert persisted["status"] == "failed"
+
+
+def test_complete_run_unknown_uid_raises_run_not_found(tracker_db: Path) -> None:
+    with pytest.raises(RunNotFoundError):
+        complete_run("0" * 32)
+
+
+def test_complete_run_invalid_status_raises_value_error(tracker_db: Path) -> None:
+    started = start_run(**_DEFAULT_KW)  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError, match="status must be one of"):
+        complete_run(started["run_uid"], status="weird")
