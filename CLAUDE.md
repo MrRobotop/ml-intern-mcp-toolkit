@@ -285,6 +285,10 @@ Append to this section as decisions are made. Format: `[YYYY-MM-DD] decision (ra
 - [TBD] Qwen3-VL-2B as demo base model (already used in `ml-agent-explorers` org, small enough for M5 Pro MPS).
 - [TBD] Oxford Pets as demo dataset (small, classification, used by existing org models, fast iteration).
 - [TBD] LoRA ranks 4, 8, 16 for the three demo variants (covers a meaningful range without being expensive).
+- [2026-05-05] `mcp` Python SDK pinned to 1.27.0 (current PyPI stable as of 2026-04-02; SDK progressed past pre-1.0 since this file was drafted, but the exact-pin policy still holds because minor versions can ship breaking changes).
+- [2026-05-05] Build backend: `hatchling` (over the `uv_build` default that `uv init --package` produces). Reason: the flat package layout, `arxiv_deep/` and `experiment_tracker/` at the repo root, is well-documented for hatchling and avoids forcing a `src/` move.
+- [2026-05-05] Pre-commit mypy hook uses `language: system` invoking `uv run mypy` (over `mirrors-mypy` with `additional_dependencies`). Reason: keeps the hook in lockstep with the project's actual venv and avoids declaring runtime deps twice.
+- [2026-05-05] CI installs `uv sync --all-groups` only, skipping `--all-extras`. Reason: the demo group (`torch`, `transformers`, `peft`, `accelerate`, `datasets`, `huggingface_hub`) is not exercised by tests yet, and skipping it saves ~3 GB of downloads per matrix cell. Revisit when Phase 4 adds tests that import torch.
 
 ---
 
