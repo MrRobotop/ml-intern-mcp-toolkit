@@ -4,9 +4,10 @@ __pycache__/
 *.pyc
 *.egg-info/
 
-# Env
+# Env (keep .env.example as the committed template)
 .env
 .env.*
+!.env.example
 
 # Test / coverage
 .coverage
