@@ -33,3 +33,5 @@ build/
 
 # Claude Code per-user settings (project-shared settings live in .claude/settings.json)
 .claude/settings.local.json
+# Claude Code worktree scratch space (created by isolation: worktree subagents)
+.claude/worktrees/
