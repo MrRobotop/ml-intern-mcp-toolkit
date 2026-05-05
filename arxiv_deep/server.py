@@ -19,6 +19,10 @@ import sys
 from mcp.server.fastmcp import FastMCP
 
 from arxiv_deep import __version__
+from arxiv_deep.tools.brief import (
+    IMPLEMENTATION_BRIEF_DESCRIPTION,
+    implementation_brief,
+)
 from arxiv_deep.tools.code import FIND_REFERENCE_CODE_DESCRIPTION, find_reference_code
 from arxiv_deep.tools.fetch import FETCH_PAPER_DESCRIPTION, fetch_paper
 from arxiv_deep.tools.figures import EXTRACT_FIGURES_DESCRIPTION, extract_figures
@@ -46,6 +50,7 @@ def build_server() -> FastMCP:
     server.add_tool(fetch_paper, description=FETCH_PAPER_DESCRIPTION)
     server.add_tool(extract_figures, description=EXTRACT_FIGURES_DESCRIPTION)
     server.add_tool(find_reference_code, description=FIND_REFERENCE_CODE_DESCRIPTION)
+    server.add_tool(implementation_brief, description=IMPLEMENTATION_BRIEF_DESCRIPTION)
     return server
 
 
