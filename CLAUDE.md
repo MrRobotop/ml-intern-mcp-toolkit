@@ -279,7 +279,7 @@ The agent calling these tools is an LLM. Tools are written for the LLM, not for 
 
 Append to this section as decisions are made. Format: `[YYYY-MM-DD] decision (rationale)`.
 
-- [TBD] License: Apache 2.0 (industry standard for ML tooling, permissive, patent grant).
+- [2026-05-05] License: Apache 2.0 (industry standard for ML tooling, permissive, patent grant).
 - [TBD] SQLite over Postgres for tracker (single-user local agent, no concurrency need).
 - [TBD] QLoRA paper (arxiv 2305.14314) as primary fixture (stable, well-known, has figures and a github reference).
 - [TBD] Qwen3-VL-2B as demo base model (already used in `ml-agent-explorers` org, small enough for M5 Pro MPS).
