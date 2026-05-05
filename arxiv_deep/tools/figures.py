@@ -33,7 +33,8 @@ from typing import Any
 import pymupdf
 
 from arxiv_deep.exceptions import FigureExtractionError
-from arxiv_deep.tools.fetch import _cache_root, _download_pdf, _normalise_id, _pdf_cache_path
+from arxiv_deep.tools import fetch as _fetch
+from arxiv_deep.tools.fetch import _cache_root, _normalise_id, _pdf_cache_path
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,10 @@ def _ensure_pdf_cached(arxiv_id: str) -> Path:
     pdf_path = _pdf_cache_path(arxiv_id)
     if not pdf_path.exists() or pdf_path.stat().st_size == 0:
         logger.info("Downloading PDF for arxiv id %s", arxiv_id)
-        _download_pdf(arxiv_id, pdf_path)
+        # Resolve via the module so test monkey-patches on
+        # ``arxiv_deep.tools.fetch._download_pdf`` take effect; importing the
+        # name directly would bind it at module load and bypass the patch.
+        _fetch._download_pdf(arxiv_id, pdf_path)
     return pdf_path
 
 

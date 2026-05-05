@@ -52,6 +52,30 @@ def tmp_cache_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 
 @pytest.fixture
+def block_arxiv_api(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Fail loudly if a test reaches the live arxiv search API.
+
+    Acts as a regression guard against test-isolation bugs where a
+    monkey-patch on ``arxiv_deep.tools.fetch._download_pdf`` or
+    ``_fetch_metadata`` does not take effect (for example because a
+    consumer module bound the name at import time). A test that opts in to
+    this fixture will fail with a clear error rather than silently hitting
+    the network and racing against arxiv rate limits in CI.
+    """
+    import arxiv
+
+    def _refuse(self: object, *args: object, **kwargs: object) -> None:
+        raise RuntimeError(
+            "Live arxiv API call leaked from a test that should be hermetic. "
+            "Check that every consumer of arxiv_deep.tools.fetch references "
+            "_download_pdf / _fetch_metadata via the fetch module attribute "
+            "(not a top-level import) so monkeypatch.setattr propagates."
+        )
+
+    monkeypatch.setattr(arxiv.Client, "results", _refuse)
+
+
+@pytest.fixture
 def mock_github_validator() -> Iterator[respx.MockRouter]:
     """Mock all GitHub HEAD requests with a 200 response.
 

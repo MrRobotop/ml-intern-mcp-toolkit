@@ -47,6 +47,7 @@ def test_qlora_returns_at_least_three_figures(
     qlora_pdf_path: Path,
     tmp_cache_dir: Path,
     monkeypatch: pytest.MonkeyPatch,
+    block_arxiv_api: None,
 ) -> None:
     _install_pdf_double(monkeypatch, qlora_pdf_path)
 
@@ -59,6 +60,7 @@ def test_at_least_one_figure_has_non_empty_caption(
     qlora_pdf_path: Path,
     tmp_cache_dir: Path,
     monkeypatch: pytest.MonkeyPatch,
+    block_arxiv_api: None,
 ) -> None:
     _install_pdf_double(monkeypatch, qlora_pdf_path)
 
@@ -73,6 +75,7 @@ def test_every_image_path_exists_and_is_png(
     qlora_pdf_path: Path,
     tmp_cache_dir: Path,
     monkeypatch: pytest.MonkeyPatch,
+    block_arxiv_api: None,
 ) -> None:
     _install_pdf_double(monkeypatch, qlora_pdf_path)
 
@@ -94,6 +97,7 @@ def test_all_page_numbers_are_positive(
     qlora_pdf_path: Path,
     tmp_cache_dir: Path,
     monkeypatch: pytest.MonkeyPatch,
+    block_arxiv_api: None,
 ) -> None:
     _install_pdf_double(monkeypatch, qlora_pdf_path)
 
@@ -111,6 +115,7 @@ def test_repeated_call_reuses_cached_images(
     qlora_pdf_path: Path,
     tmp_cache_dir: Path,
     monkeypatch: pytest.MonkeyPatch,
+    block_arxiv_api: None,
 ) -> None:
     _install_pdf_double(monkeypatch, qlora_pdf_path)
 
