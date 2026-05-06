@@ -15,7 +15,12 @@ test:
 
 ## test-cov: Run pytest with coverage on arxiv_deep and experiment_tracker
 test-cov:
-	uv run pytest --cov=arxiv_deep --cov=experiment_tracker --cov-report=term-missing
+	uv run pytest \
+		--cov=arxiv_deep --cov=experiment_tracker \
+		--cov-branch \
+		--cov-report=term-missing \
+		--cov-report=xml \
+		--cov-fail-under=85
 
 ## lint: Check ruff lint and format (read-only)
 lint:

@@ -1,0 +1,95 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # required to create the GitHub Release
+  id-token: write   # required for trusted PyPI publishing if enabled
+
+jobs:
+  build-and-release:
+    name: build + release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Full history is needed for the changelog extractor below.
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          python-version: "3.12"
+
+      - name: Sync dependencies (runtime + dev)
+        run: uv sync --all-groups
+
+      - name: Lint and typecheck
+        run: |
+          make lint
+          make typecheck
+
+      - name: Test with coverage
+        run: make test-cov
+
+      - name: Build wheel and sdist
+        run: uv build
+
+      - name: Extract release notes from CHANGELOG
+        id: notes
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG_NAME#v}"
+          # Pull the section between "## [<version>]" and the next "## [".
+          # Falls back to "[Unreleased]" if no version-pinned section exists
+          # yet (helps catch tag-before-changelog-bump mistakes early).
+          notes_file="$(mktemp)"
+          if grep -qE "^## \[${version}\]" CHANGELOG.md; then
+              awk -v ver="${version}" '
+                  $0 ~ "^## \\[" ver "\\]" { found=1; next }
+                  found && /^## \[/ { exit }
+                  found { print }
+              ' CHANGELOG.md > "${notes_file}"
+          else
+              echo "WARNING: no [${version}] section in CHANGELOG; falling back to [Unreleased]" >&2
+              awk '
+                  /^## \[Unreleased\]/ { found=1; next }
+                  found && /^## \[/ { exit }
+                  found { print }
+              ' CHANGELOG.md > "${notes_file}"
+          fi
+          if [[ ! -s "${notes_file}" ]]; then
+              echo "Release notes are empty; refusing to publish." >&2
+              exit 1
+          fi
+          echo "notes_file=${notes_file}" >> "${GITHUB_OUTPUT}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+          NOTES_FILE: ${{ steps.notes.outputs.notes_file }}
+        run: |
+          set -euo pipefail
+          gh release create "${TAG_NAME}" \
+              --title "${TAG_NAME}" \
+              --notes-file "${NOTES_FILE}" \
+              dist/*
+
+      - name: Publish to PyPI (opt-in)
+        if: ${{ env.PYPI_API_TOKEN != '' }}
+        env:
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          uv publish --token "${PYPI_API_TOKEN}"
