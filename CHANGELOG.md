@@ -8,6 +8,16 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- _(record changes for the next release here)_
+
+## [0.1.0] - 2026-05-06
+
+First public release. The toolkit ships two MCP servers, an end-to-end
+demo, and a release pipeline. Six development phases summarised below
+landed everything from repo skeleton to a tag-triggered GitHub Release.
+
+### Added
+
 - **`arxiv-deep` MCP server** with four tools that let an LLM agent read
   arxiv papers properly:
   - `fetch_paper(arxiv_id)`: title, authors, abstract, full body text
@@ -93,4 +103,5 @@ project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   429. Switched to module-level reference + added the `block_arxiv_api`
   conftest fixture as a regression sentinel.
 
-[Unreleased]: https://github.com/MrRobotop/ml-intern-mcp-toolkit/compare/HEAD
+[Unreleased]: https://github.com/MrRobotop/ml-intern-mcp-toolkit/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/MrRobotop/ml-intern-mcp-toolkit/releases/tag/v0.1.0

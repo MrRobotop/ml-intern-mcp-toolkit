@@ -1,6 +1,6 @@
 [project]
 name = "ml-intern-mcp-toolkit"
-version = "0.0.0"
+version = "0.1.0"
 description = "MCP toolkit extending Hugging Face's ml-intern with deep arxiv reading and experiment tracking."
 readme = "README.md"
 requires-python = ">=3.11,<3.13"

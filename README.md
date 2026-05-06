@@ -134,6 +134,6 @@ The repo also publishes a [`Code of Conduct`](CODE_OF_CONDUCT.md).
              tracking for Hugging Face's ml-intern agent},
   year    = {2026},
   url     = {https://github.com/MrRobotop/ml-intern-mcp-toolkit},
-  version = {0.1}
+  version = {0.1.0}
 }
 ```
