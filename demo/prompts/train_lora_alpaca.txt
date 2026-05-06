@@ -1,0 +1,117 @@
+You are running an end-to-end fine-tuning experiment. Use the arxiv-deep and
+experiment-tracker MCP tools the user has wired in. Follow the steps below;
+choose how to call the tools yourself.
+
+## Goal
+
+Run three LoRA fine-tuning variants of a small language model on a slice of the
+Alpaca instruction-tuning dataset. Compare their final losses, pick a winner,
+and publish that winner to a Hugging Face model repository with a generated
+model card that links back to the toolkit and the QLoRA paper.
+
+## Configuration the user has set
+
+The orchestrator script exports these environment variables before invoking
+you. Read them, do not redefine them.
+
+- ML_INTERN_TOOLKIT_PATH: absolute path to the toolkit checkout. Pass it through
+  to the training script via uv run --project.
+- DEMO_MODEL: the base model id. Default is HuggingFaceTB/SmolLM2-135M-Instruct.
+- DEMO_DATASET: the dataset id. Default is tatsu-lab/alpaca.
+- DEMO_QUICK: 1 means use the small subset (50 train, 10 val, 1 epoch). Anything
+  else (or unset) means the full training run (1000 train, 200 val, 3 epochs).
+- DEMO_PUSH_TO_ORG: 1 means publish the winner to ml-agent-explorers/<repo>.
+  Unset means publish to the authenticated user's namespace.
+- HF_TOKEN: write-scope token used by the training script for the upload step.
+
+## Step 1: read the QLoRA paper
+
+Call arxiv-deep_implementation_brief on arxiv id 2305.14314. Use the brief
+the tool returns to ground the rest of the run; specifically pay attention
+to the LoRA hyperparameters and the recommended target modules.
+
+State the paper's title and one sentence about its core method back to the
+user before you start training.
+
+## Step 2: start three runs in the experiment tracker
+
+For each LoRA rank in [4, 8, 16], call experiment-tracker_start_run with:
+
+- recipe = f"smollm2-lora-rank-{rank}"
+- model_base = the value of $DEMO_MODEL
+- dataset = the value of $DEMO_DATASET
+- hyperparameters = a dict containing lora_rank, lora_alpha (= 2 * lora_rank),
+  learning_rate (1e-4), batch_size (4), and epochs (1 if DEMO_QUICK else 3)
+- notes = "Phase 4 demo run; quick mode" if DEMO_QUICK else "Phase 4 demo run"
+
+Save each returned run_uid for later steps. The training script needs them.
+
+## Step 3: train each variant
+
+For each rank, invoke the training script. The orchestrator already exports
+ML_INTERN_TOOLKIT_PATH; the canonical invocation is:
+
+```
+uv run --project $ML_INTERN_TOOLKIT_PATH \
+    python $ML_INTERN_TOOLKIT_PATH/demo/scripts/train_local.py \
+    --model-base $DEMO_MODEL \
+    --dataset $DEMO_DATASET \
+    --lora-rank <rank> \
+    --epochs <epochs> \
+    --lr 1e-4 \
+    --batch-size 4 \
+    --output-dir <a writable directory under /tmp> \
+    --run-uid <run_uid from step 2> \
+    [--quick if DEMO_QUICK=1]
+```
+
+For DEMO_MODE=hf-jobs, replace train_local.py with train_hf_jobs.py. Same
+flags. The script writes a single JSON line to stdout when training completes:
+{"final_loss": float, "checkpoint_dir": str}. Capture and parse that line.
+
+For each run, after the training script returns:
+
+- Call experiment-tracker_log_metric with name="final_loss", step=<epochs>,
+  value=<final_loss from the JSON line>.
+- Call experiment-tracker_log_artifact with kind="adapter",
+  uri=<checkpoint_dir from the JSON line>.
+- Call experiment-tracker_complete_run with run_uid and status="completed".
+
+If a training script fails, call complete_run with status="failed" instead and
+keep going with the remaining ranks. Do not abandon the demo on a single
+failure; report the failure cleanly to the user at the end.
+
+## Step 4: compare and pick the winner
+
+Call experiment-tracker_compare_runs on the three run_uids with
+metric_name="final_loss". Show the user the rendered Markdown table.
+
+Call experiment-tracker_best_run with metric_name="final_loss",
+direction="min" (lower loss is better). The returned dict gives you the
+winning run_uid, recipe, hyperparameters, and the artifact list.
+
+## Step 5: publish the winner
+
+The training script for the winning rank already saved its adapter at the URI
+recorded in step 3. Push that adapter to a Hugging Face repo:
+
+- If $DEMO_PUSH_TO_ORG = "1", target = "ml-agent-explorers/{recipe}-{short_uid}".
+- Otherwise target = "{authenticated_hf_user}/{recipe}-{short_uid}".
+
+Where short_uid is the first 8 hex characters of the winning run_uid. The
+training script accepts a --push-to-hub <repo_id> flag that performs the upload
+and writes a generated README.md model card. Re-invoke the training script with
+that flag and the winning run's hyperparameters; or, simpler, instruct the user
+to run a separate publish command — your call.
+
+## Step 6: summarise
+
+In one paragraph, tell the user:
+
+- The QLoRA paper title and one-sentence summary.
+- The three final losses with their LoRA ranks.
+- The winning rank and its loss.
+- The published model URL.
+- A reminder to inspect the experiment_tracker DB for the full run history.
+
+That is the full demo. Begin.

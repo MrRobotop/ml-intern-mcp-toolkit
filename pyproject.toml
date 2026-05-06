@@ -58,7 +58,11 @@ select = ["E", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF"]
 strict = true
 python_version = "3.11"
 files = ["arxiv_deep", "experiment_tracker"]
-exclude = ["^tests/"]
+# Tests and demo scripts intentionally fall outside the strict-typed surface.
+# Tests rely on monkey-patching that mypy cannot model cleanly; demo scripts
+# pull in torch/transformers/peft whose stub coverage is incomplete and not
+# worth hand-rolling for a standalone training entry point.
+exclude = ["^tests/", "^demo/"]
 
 # Third-party packages that lack a py.typed marker or ship incomplete stubs.
 # We only silence the missing-stub error; our own code remains under strict.

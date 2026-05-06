@@ -22,6 +22,10 @@ htmlcov/
 tests/fixtures/cache/
 ~/.cache/arxiv-deep/
 
+# Demo artefacts produced at runtime
+demo/last_run.transcript.txt
+demo/output/
+
 # Binary fixtures
 *.pdf
 *.png
