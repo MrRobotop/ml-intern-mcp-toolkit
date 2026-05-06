@@ -54,6 +54,10 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF"]
 
+[tool.ruff.lint.per-file-ignores]
+# Doc generator embeds Markdown tables that legitimately exceed 100 cols.
+"scripts/gen_tool_reference.py" = ["E501"]
+
 [tool.mypy]
 strict = true
 python_version = "3.11"
@@ -62,7 +66,7 @@ files = ["arxiv_deep", "experiment_tracker"]
 # Tests rely on monkey-patching that mypy cannot model cleanly; demo scripts
 # pull in torch/transformers/peft whose stub coverage is incomplete and not
 # worth hand-rolling for a standalone training entry point.
-exclude = ["^tests/", "^demo/"]
+exclude = ["^tests/", "^demo/", "^examples/", "^scripts/"]
 
 # Third-party packages that lack a py.typed marker or ship incomplete stubs.
 # We only silence the missing-stub error; our own code remains under strict.

@@ -23,9 +23,11 @@ For feature requests, describe the use case before the proposed solution. The "w
 1. Open an issue first for non-trivial changes, so we can agree on direction before code is written.
 2. Branch off `main`. One concern per PR. Refactors and feature work do not mix.
 3. Run `make lint`, `make typecheck`, and `make test` locally before pushing.
-4. Push to a feature branch and open a PR against `main`. Fill out the PR template at [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
-5. CI must be green. PRs with red CI will not be reviewed.
-6. Expect review feedback. Push fixups; we will squash-merge.
+4. Add a line to the `[Unreleased]` section of [`CHANGELOG.md`](CHANGELOG.md). The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Group entries under `Added`, `Changed`, `Fixed`, `Deprecated`, `Removed`, or `Security` as appropriate. PRs without a changelog entry will be asked to add one.
+5. If your change touches a tool description or schema, run `make docs` and commit the regenerated `docs/tool_reference.md`. The `tests/integration/test_tool_reference_in_sync.py` test will fail in CI otherwise.
+6. Push to a feature branch and open a PR against `main`. Fill out the PR template at [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md).
+7. CI must be green. PRs with red CI will not be reviewed.
+8. Expect review feedback. Push fixups; we will squash-merge.
 
 ## Local development setup
 

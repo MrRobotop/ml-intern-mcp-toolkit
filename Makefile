@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help setup test test-cov lint typecheck format demo clean
+.PHONY: help setup test test-cov lint typecheck format demo docs docs-check clean
 
 ## help: Show this help message
 help:
@@ -34,6 +34,14 @@ format:
 ## demo: Run the end-to-end demo script
 demo:
 	./demo/run_demo.sh
+
+## docs: Regenerate docs/tool_reference.md from the live MCP server registrations
+docs:
+	uv run python scripts/gen_tool_reference.py
+
+## docs-check: Verify docs/tool_reference.md is in sync with the source
+docs-check:
+	uv run python scripts/gen_tool_reference.py --check
 
 ## clean: Remove caches, coverage reports, and build artifacts
 clean:
